@@ -11,7 +11,8 @@ class ContractVerificationButton extends React.Component {
       explorerAPIUrl: "",
       explorerAPIKey: "",
       network: "",
-      verificationStatus: ""
+      verificationStatus: "",
+      isVerifying: false
     };
   }
 
@@ -31,6 +32,7 @@ class ContractVerificationButton extends React.Component {
     const sdk = new ThirdwebSDK(network || CronosBeta); // Use CronosBeta if network is empty
 
     try {
+      this.setState({ isVerifying: true, verificationStatus: "" });
       await sdk.verifier.verifyContract(
         contractAddress,
         explorerAPIUrl,
@@ -40,6 +42,8 @@ class ContractVerificationButton extends React.Component {
     } catch (error) {
       console.error(error);
       this.setState({ verificationStatus: "Verification Failed" });
+    } finally {
+      this.setState({ isVerifying: false });
     }
   };
 
@@ -49,7 +53,8 @@ class ContractVerificationButton extends React.Component {
       explorerAPIUrl,
       explorerAPIKey,
       network,
-      verificationStatus
+      verificationStatus,
+      isVerifying
     } = this.state;
 
     return (
@@ -100,8 +105,12 @@ class ContractVerificationButton extends React.Component {
         </div>
 
         <div className={styles.card}>
-          <button className={styles.button} onClick={this.verifyContract}>
-            Verify Contract
+          <button
+            className={styles.button}
+            onClick={this.verifyContract}
+            disabled={isVerifying}
+          >
+            {isVerifying ? "Verifying Contract..." : "Verify Contract"}
           </button>
           <p>{verificationStatus}</p>
         </div>
